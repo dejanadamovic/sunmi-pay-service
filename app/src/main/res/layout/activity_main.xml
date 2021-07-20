@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <CheckBox
+            android:id="@+id/cbUseApduTransmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="APDU Transmit"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/btnSetApplet"
+                android:text="SET APPLET"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tvAppletRes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SET APPLET RESPONSE"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/btnVerifyPin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VERIFY PIN" />
+
+            <TextView
+                android:id="@+id/tvVerifyPinRes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="VERIFY PIN RESPONSE" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnExtractCert"
+                android:text="EXPORT CERTIFICATE"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvExportCertRes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EXPORT CERT RESPONSE"
+                android:paddingTop="16dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
