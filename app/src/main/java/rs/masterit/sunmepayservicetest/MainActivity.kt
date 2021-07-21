@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun sendApduTransmit(command: String, lc: String, indata: String, le: String): String {
         return try {
-            val recv = ByteArray(260)
+            val recv = ByteArray(2048)
 
             val len: Int = mReadCardOptV2!!.transmitApdu(cardType, ByteUtil.hexStr2Bytes("$command$lc$indata$le"), recv)
 
