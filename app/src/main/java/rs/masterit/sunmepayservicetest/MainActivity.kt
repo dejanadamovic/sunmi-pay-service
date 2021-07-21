@@ -1,13 +1,19 @@
 package rs.masterit.sunmepayservicetest
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.os.RemoteException
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.sunmi.pay.hardware.aidl.AidlConstants
+import com.sunmi.pay.hardware.aidlv2.AidlErrorCodeV2
 import com.sunmi.pay.hardware.aidlv2.bean.ApduRecvV2
 import com.sunmi.pay.hardware.aidlv2.bean.ApduSendV2
 import com.sunmi.pay.hardware.aidlv2.readcard.CheckCardCallbackV2
@@ -52,6 +58,8 @@ class MainActivity : AppCompatActivity() {
             val res = if (cb.isChecked)sendApduTransmit("88040400", "00", "0000", "00")
                         else sendApduCommand("88040400", "00", "0000", "00")
 
+            //cla   ins     p1      p2      lc      data    le
+            //88    04      04      00      000000          00FFFF
             findViewById<TextView>(R.id.tvExportCertRes).text = res
         }
     }
@@ -87,14 +95,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun sendApduTransmit(command: String, lc: String, indata: String, le: String): String {
         return try {
-            val recv = ByteArray(65520)
-            val code: Int = mReadCardOptV2!!.transmitApdu(cardType, "$command$lc$indata$le".toByteArray(), recv)
+            val recv = ByteArray(260)
 
-            if (code < 0) {
-                Toast.makeText(this@MainActivity, "SEND fail with code: $code", Toast.LENGTH_LONG).show()
-                "ERROR";
+            val len: Int = mReadCardOptV2!!.transmitApdu(cardType, ByteUtil.hexStr2Bytes("$command$lc$indata$le"), recv)
+
+            if (len < 0) {
+                Toast.makeText(this@MainActivity, "SEND fail with error: ${AidlErrorCodeV2.valueOf(len).msg}", Toast.LENGTH_LONG).show()
+                "ERROR"
             } else {
-                recv.toHex()
+                val valid = recv.copyOf(len)
+
+                val outData: ByteArray = valid.copyOf(valid.size - 2)
+                val swa: Byte = valid[valid.size - 2] //swa
+                val swb: Byte = valid[valid.size - 1] //swb
+                showApduRecv(len, outData, swa, swb)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -115,7 +129,7 @@ class MainActivity : AppCompatActivity() {
 
             if (code < 0) {
                 Toast.makeText(this@MainActivity, "SEND fail with code: $code", Toast.LENGTH_LONG).show()
-                "ERROR";
+                "ERROR"
             } else {
                 showApduRecv(recv.outlen.toInt(), recv.outData, recv.swa, recv.swb)
             }
@@ -125,14 +139,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showApduRecv(outLen: Int, outData: ByteArray, swa: Byte, swb: Byte) : String {
+    private fun showApduRecv(outLen: Int, outData: ByteArray, swa: Byte, swb: Byte): String {
         val swaStr = ByteUtil.bytes2HexStr(swa)
         val swbStr = ByteUtil.bytes2HexStr(swb)
         val tmp1 = outData.copyOf(outLen)
         val outDataStr = tmp1.toHex()
-        val temp = String.format("SWA:%s\nSWB:%s\noutData:%s", swaStr, swbStr, outDataStr)
-        return temp
+        return String.format("SWA:%s\nSWB:%s\noutData:%s", swaStr, swbStr, outDataStr)
     }
+
 
     private fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
